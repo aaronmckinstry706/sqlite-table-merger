@@ -1,5 +1,6 @@
 
 import os
+import sqlite3
 import unittest
 
 import merge
@@ -10,9 +11,9 @@ class MergeTest(unittest.TestCase):
         cls._resource_directory = "unit_test_resources"
     
     def test_get_relative_database_paths(self):
-        actual_paths = set(merge.get_relative_database_paths("unit_test_resources"))
+        actual_paths = set(merge.get_relative_database_paths(self._resource_directory))
         expected_paths = set(
-            [self._resource_directory + '/' + name
+            [self._resource_directory + "/" + name
              for name in ["student_names.db", "professor_names.db", "mixed_names.db"]])
         self.assertSetEqual(expected_paths, actual_paths)
     
@@ -20,7 +21,20 @@ class MergeTest(unittest.TestCase):
         pass
     
     def test_initialize_by_merge(self):
-        pass
+        database_path = self._resource_directory + "/professor_names.db"
+        merged_path = self._resource_directory + "/merged_names.db"
+        
+        connection = sqlite3.connect(merged_path)
+        cursor = connection.cursor()
+        merge.initialize_by_merge(database_path, cursor, "names")
+        
+        cursor.execute("SELECT * FROM names")
+        rows = cursor.fetchall()
+        
+        connection.close()
+        os.remove(merged_path)
+        
+        self.assertListEqual([("anassi", "bari")], rows)
 
 if __name__ == '__main__':
     unittest.main()

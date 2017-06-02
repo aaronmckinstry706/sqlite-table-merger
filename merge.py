@@ -10,11 +10,8 @@ def get_relative_database_paths(database_directory):
 
 def initialize_by_merge(database_path, cursor, table_name):
     cursor.execute("ATTACH '" + database_path + "' AS to_merge")
-    cursor.execute("BEGIN")
     cursor.execute("CREATE TABLE " + table_name + " AS SELECT * FROM to_merge." + table_name)
-    cursor.execute("COMMIT")
     cursor.execute("DETACH to_merge")
-    cursor.commit()
 
 def merge(database_path, cursor, table_name):
     cursor.execute("ATTACH '" + database_path + "' AS to_merge")
@@ -22,7 +19,6 @@ def merge(database_path, cursor, table_name):
     cursor.execute("INSERT INTO " + table_name + " SELECT * FROM to_merge." + table_name)
     cursor.execute("COMMIT")
     cursor.execute("DETACH to_merge")
-    cursor.commit()
 
 if __name__ == '__main__':
     
