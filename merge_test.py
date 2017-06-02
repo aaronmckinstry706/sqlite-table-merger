@@ -18,23 +18,41 @@ class MergeTest(unittest.TestCase):
         self.assertSetEqual(expected_paths, actual_paths)
     
     def test_merge(self):
-        pass
-    
-    def test_initialize_by_merge(self):
-        database_path = self._resource_directory + "/professor_names.db"
+        database_paths = merge.get_relative_database_paths(self._resource_directory)
         merged_path = self._resource_directory + "/merged_names.db"
         
         connection = sqlite3.connect(merged_path)
         cursor = connection.cursor()
-        merge.initialize_by_merge(database_path, cursor, "names")
+        merge.initialize_by_merge(database_paths[0], cursor, "names")
+        for database_path in database_paths:
+            merge.merge(database_path, cursor, "names")
         
         cursor.execute("SELECT * FROM names")
-        rows = cursor.fetchall()
+        rows = set(cursor.fetchall())
         
         connection.close()
         os.remove(merged_path)
         
-        self.assertListEqual([("anassi", "bari")], rows)
+        expected_rows = set(
+            [("anassi", "bari"), ("henry", "lin"), ("aaron", "mckinstry"), ("gen", "xiang")])
+        self.assertSetEqual(expected_rows, rows)
+    
+    def test_initialize_by_merge(self):
+        database_path = self._resource_directory + "/professor_names.db"
+        initialized_path = self._resource_directory + "/initialized_names.db"
+        
+        connection = sqlite3.connect(initialized_path)
+        cursor = connection.cursor()
+        merge.initialize_by_merge(database_path, cursor, "names")
+        
+        cursor.execute("SELECT * FROM names")
+        rows = set(cursor.fetchall())
+        
+        connection.close()
+        os.remove(initialized_path)
+        
+        expected_rows = set([("anassi", "bari")])
+        self.assertSetEqual(expected_rows, rows)
 
 if __name__ == '__main__':
     unittest.main()

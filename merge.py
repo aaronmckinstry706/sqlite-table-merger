@@ -15,9 +15,7 @@ def initialize_by_merge(database_path, cursor, table_name):
 
 def merge(database_path, cursor, table_name):
     cursor.execute("ATTACH '" + database_path + "' AS to_merge")
-    cursor.execute("BEGIN")
     cursor.execute("INSERT INTO " + table_name + " SELECT * FROM to_merge." + table_name)
-    cursor.execute("COMMIT")
     cursor.execute("DETACH to_merge")
 
 if __name__ == '__main__':
