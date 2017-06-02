@@ -3,6 +3,11 @@ import os
 import sqlite3
 import sys
 
+def get_relative_database_paths(database_directory):
+    return [database_directory + '/' + name
+            for name in os.listdir(database_directory)
+            if os.path.isfile(database_directory + '/' + name)]
+
 def initialize_by_merge(database_path, cursor, table_name):
     cursor.execute("ATTACH '" + database_path + "' AS to_merge")
     cursor.execute("BEGIN")
@@ -31,7 +36,7 @@ if __name__ == '__main__':
     
     merged_connection = sqlite3.connect('merged.db')
     merged_cursor = merged_connection.cursor()
-    database_paths = [database_directory + '/' + name for name in os.listdir(database_directory) if os.path.isfile(database_directory + '/' + name)]
+    database_paths = get_relative_database_paths(database_directory)
     
     initialize_by_merge(database_paths[0], merged_cursor, table_name)
     for database_path in database_paths[1:]:
