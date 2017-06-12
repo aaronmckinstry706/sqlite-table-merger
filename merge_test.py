@@ -34,7 +34,12 @@ class MergeTest(unittest.TestCase):
         os.remove(merged_path)
         
         expected_rows = sorted(
-            [("anassi", "bari"), ("henry", "lin"), ("aaron", "mckinstry"), ("gen", "xiang")])
+            [("anassi", "bari"),
+             ("anassi", "bari"),
+             ("henry", "lin"),
+             ("henry", "lin"),
+             ("aaron", "mckinstry"),
+             ("gen", "xiang")])
         self.assertListEqual(expected_rows, rows)
     
     def test_initialize_by_merge(self):
